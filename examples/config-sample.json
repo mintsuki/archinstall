@@ -16,7 +16,7 @@
             "flags": [
               "boot"
             ],
-            "fs_type": "fat32",
+            "fs_type": "fat",
             "size": {
               "sector_size": null,
               "unit": "MiB",

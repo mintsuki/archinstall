@@ -5,7 +5,7 @@
                 "boot": true,
                 "encrypted": false,
                 "filesystem": {
-                    "format": "fat32"
+                    "format": "fat"
                 },
                 "wipe": true,
                 "mountpoint": "/boot",

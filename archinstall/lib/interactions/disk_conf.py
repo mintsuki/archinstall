@@ -245,7 +245,7 @@ def _boot_partition(sector_size: SectorSize, using_gpt: bool) -> PartitionModifi
 		start=start,
 		length=size,
 		mountpoint=Path('/boot'),
-		fs_type=FilesystemType.Fat32,
+		fs_type=FilesystemType.Fat,
 		flags=flags
 	)
 

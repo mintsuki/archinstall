@@ -157,9 +157,13 @@ class DeviceHandler:
 	) -> FilesystemType | None:
 		try:
 			if partition.fileSystem:
-				if partition.fileSystem.type == FilesystemType.LinuxSwap.parted_value:
-					return FilesystemType.LinuxSwap
-				return FilesystemType(partition.fileSystem.type)
+				match partition.fileSystem.type:
+					case 'linux-swap(v1)':
+						return FilesystemType.LinuxSwap
+					case 'fat12' | 'fat16' | 'fat32':
+						return FilesystemType.Fat
+					case _:
+						return FilesystemType(partition.fileSystem.type)
 			elif lsblk_info is not None:
 				return FilesystemType(lsblk_info.fstype) if lsblk_info.fstype else None
 			return None
@@ -277,10 +281,6 @@ class DeviceHandler:
 			case FilesystemType.Ext2 | FilesystemType.Ext3 | FilesystemType.Ext4:
 				# Force create
 				options.append('-F')
-			case FilesystemType.Fat12 | FilesystemType.Fat16 | FilesystemType.Fat32:
-				mkfs_type = 'fat'
-				# Set FAT size
-				options.extend(('-F', fs_type.value.removeprefix(mkfs_type)))
 			case FilesystemType.Ntfs:
 				# Skip zeroing and bad sector check
 				options.append('--fast')
@@ -552,7 +552,7 @@ class DeviceHandler:
 			length=length_sector.value
 		)
 
-		fs_value = part_mod.safe_fs_type.parted_value
+		fs_value = self.find_partition(part_mod.safe_dev_path).fileSystem.type
 		filesystem = FileSystem(type=fs_value, geometry=geometry)
 
 		partition = Partition(

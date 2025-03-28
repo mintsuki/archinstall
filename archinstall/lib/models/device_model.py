@@ -767,9 +767,7 @@ class FilesystemType(Enum):
 	Ext3 = 'ext3'
 	Ext4 = 'ext4'
 	F2fs = 'f2fs'
-	Fat12 = 'fat12'
-	Fat16 = 'fat16'
-	Fat32 = 'fat32'
+	Fat = 'fat'
 	Ntfs = 'ntfs'
 	Xfs = 'xfs'
 	LinuxSwap = 'linux-swap'
@@ -786,14 +784,10 @@ class FilesystemType(Enum):
 		match self:
 			case FilesystemType.Ntfs:
 				return 'ntfs3'
-			case FilesystemType.Fat32:
+			case FilesystemType.Fat:
 				return 'vfat'
 			case _:
 				return self.value
-
-	@property
-	def parted_value(self) -> str:
-		return self.value + '(v1)' if self == FilesystemType.LinuxSwap else self.value
 
 	@property
 	def installation_pkg(self) -> str | None:
@@ -953,11 +947,7 @@ class PartitionModification:
 	def is_efi(self) -> bool:
 		return (
 			any(set(self.flags) & set(self._efi_indicator_flags))
-			and (
-				self.fs_type == FilesystemType.Fat12
-				or self.fs_type == FilesystemType.Fat16
-				or self.fs_type == FilesystemType.Fat32
-			)
+			and self.fs_type == FilesystemType.Fat
 			and PartitionFlag.XBOOTLDR not in self.flags
 		)
 
